@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des employés</title>
+</head>
+<body>
+<h2>Liste des employés</h2>
+
+<!-- Bouton Ajouter -->
+<a th:href="@{/add}">
+    <button type="button">Ajouter un employé</button>
+</a>
+
+<br/><br/>
+
+<!-- Tableau des employés -->
+<table border="1" cellpadding="10">
+    <thead>
+    <tr>
+        <th>Prénom</th>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${employees.empty}">
+        <td colspan="4">Aucun employé en base de données</td>
+    </tr>
+    <tr th:each="employee : ${employees}">
+        <td th:text="${employee.name}">Prénom</td>
+        <td th:text="${employee.surname}">Nom</td>
+        <td th:text="${employee.email}">Email</td>
+        <td>
+            <!-- Bouton Modifier -->
+            <a th:href="@{'/edit/' + ${employee.id}}">
+                <button type="button">Modifier</button>
+            </a>
+
+            <!-- Bouton Supprimer -->
+            <a th:href="@{'/delete/' + ${employee.id}}" onclick="return confirm('Confirmer la suppression ?')">
+                <button type="button">Supprimer</button>
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
