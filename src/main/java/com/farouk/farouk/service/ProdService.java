@@ -1,5 +1,6 @@
 package com.farouk.farouk.service;
 
+import com.farouk.farouk.dao.ProduitsDto;
 import com.farouk.farouk.model.Boutiques;
 import com.farouk.farouk.model.Produits;
 import com.farouk.farouk.repository.BoutiqueRepository;
@@ -22,30 +23,24 @@ public class ProdService {
     public Produits save(Produits p){
         return produitRepository.saveAndFlush(p);
     }
-    public Produits update(String nom, String code, Integer stock,long idBoutique) {
-        Produits existing = produitRepository.findByNom(nom)
+    public Produits update(ProduitsDto pDto) {
+        Produits existing = produitRepository.findByNom(pDto.getNom())
                 .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
-        existing.setCode(code);
-        existing.setStock(stock);
+        existing.setCode(pDto.getCode());
+        existing.setStock(pDto.getStock());
 
-        if (idBoutique != 0) {
-            Boutiques boutique = boutiqueRepository.findById(idBoutique)
+        if (pDto.getIdBoutique() != 0) {
+            Boutiques boutique = boutiqueRepository.findById(pDto.getIdBoutique())
                     .orElseThrow(() -> new RuntimeException("Boutique non trouvée"));
             existing.setBoutique(boutique);
         }
 
-
         return produitRepository.saveAndFlush(existing);
     }
    public void delete(String nomP){
-       Optional<Produits> produitOptional = produitRepository.findByCode(nomP);
-        if(produitOptional.isEmpty()){
-            System.out.println("le produit du nom "+nomP+" n'existe pas");
-            return;
-        }
-            Produits produittrouver = produitOptional.get();
+       Produits produit = produitRepository.findByNom(nomP).orElseThrow(()-> new RuntimeException("le produit que vous voulez supp is not found"));
             produitRepository.deleteByCode(nomP);
-            System.out.println("vous aviez supp le produit "+ produittrouver.getNom()+" avec succe!!!");
+            System.out.println("vous aviez supp le produit "+ produit.getNom()+" avec succe!!!");
    }
 
 }

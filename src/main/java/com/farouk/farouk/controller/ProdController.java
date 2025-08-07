@@ -1,5 +1,6 @@
 package com.farouk.farouk.controller;
 
+import com.farouk.farouk.dao.ProduitsDto;
 import com.farouk.farouk.model.Produits;
 import com.farouk.farouk.service.ProdService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,8 @@ public class ProdController {
         return prodService.save(p);
     }
     @PostMapping("/updateP")
-    public Produits updateProduit(@RequestParam String nom,@RequestParam String code,@RequestParam Integer stock,@RequestParam long idBoutique){
-        return prodService.update(nom,code,stock,idBoutique);
+    public Produits updateProduit(@RequestBody ProduitsDto pdto){
+        return prodService.update(pdto);
     }
     @DeleteMapping("/deleteP")
     public void deleteProduit(@RequestBody String nomP){

@@ -1,5 +1,7 @@
 package com.farouk.farouk.service;
 
+import com.farouk.farouk.dao.MouvementDto;
+import com.farouk.farouk.mapper.MouvementMapper;
 import com.farouk.farouk.model.Mouvement;
 import com.farouk.farouk.model.Produits;
 import com.farouk.farouk.repository.MouvementRepository;
@@ -19,6 +21,8 @@ public class MouvService {
     ProdService prodService;
     @Autowired
     ProduitRepository produitRepository;
+    @Autowired
+    MouvementMapper mouvementMapper;
 
     public List<Mouvement> getAllMouvements() {
         return mouvRepository.findAll();
@@ -27,29 +31,35 @@ public class MouvService {
         return mouvRepository.findByType(type);
     }
 
-    public Mouvement entreSortie(String nomP, Integer qteP, String typeP,Integer prix) {
-        Optional<Produits> produitOptional = produitRepository.findByNom(nomP);
-        if (produitOptional.isEmpty()) {
-            System.out.println("Produit non trouvé");
-        }
-        Produits produit = produitOptional.get();
-        Mouvement m = new Mouvement();
-        if ("ENTRE".equalsIgnoreCase(typeP)) {
-            produit.setStock(produit.getStock() + qteP);
-           // m.setPrix(null);m.setMontant(null);
-        } else if ("SORTIE".equalsIgnoreCase(typeP)) {
-            if (produit.getStock() < qteP) {
-                System.out.println("Stock insuffisant pour le produit " + produit.getNom());
+    public Mouvement entreSortie(MouvementDto dto) {
+        Produits produit = produitRepository.findByNom(dto.getNomProduit()).orElseThrow(()-> new RuntimeException("Produit non trouvé"));
+        Mouvement mouvement = new Mouvement();
+        mouvement.setType(dto.getType());
+        if ("ENTRE".equalsIgnoreCase(mouvement.getType())) {
+            if (dto.getQte() <= 0) {
+                System.out.println("dans une entre il faut la quantity");
             }
-            produit.setStock(produit.getStock() - qteP);
-
+           mouvement.setQte(dto.getQte());
+           mouvement.setProduit(produit);
+        } else if ("SORTIE".equalsIgnoreCase(mouvement.getType())) {
+            if (produit.getStock() < dto.getQte() || dto.getQte() <= 0) {
+                System.out.println("Stock insuffisant ou la qte est <= 0 pour le produit " + produit.getNom());
+            }
+            produit.setStock(produit.getStock() - dto.getQte());
+            mouvement.setQte(dto.getQte());
+            mouvement.setProduit(produit);
+        } else if ("DEPENSE".equalsIgnoreCase(mouvement.getType())) {
+            if (dto.getDescription() == null || "".equals(dto.getDescription())) {
+                System.out.println("donner le motif de la depende ");
+            }
+            mouvement.setDescription(dto.getDescription());
+            mouvement.setMontant(dto.getMontant());
         } else {
-            System.out.println("Type de mouvement inconnu : " + typeP);
+            System.out.println("Type de mouvement inconnu : " + mouvement.getType());
         }
         produitRepository.saveAndFlush(produit);
-        m.setQte(qteP); m.setProduit(produit); m.setType(typeP); m.setPrix(prix);m.setMontant(qteP*prix);
         System.out.println("Stock mis à jour avec succès pour " + produit.getNom());
-        return mouvRepository.saveAndFlush(m);
+        return mouvRepository.saveAndFlush(mouvement);
     }
     public Mouvement update(Mouvement m) {
          Mouvement existing =  mouvRepository.findById(m.getId()).orElseThrow(() -> new RuntimeException("mouvement avec Id "+m.getId()+" est non trouvé"));

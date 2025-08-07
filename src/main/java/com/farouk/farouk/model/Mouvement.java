@@ -5,8 +5,7 @@ import  jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -16,16 +15,11 @@ public class Mouvement {
     Long id;
     //Date date;
     String type;
+    String description;
     Integer qte;
     Integer montant;
     Integer prix;
 
-    public Mouvement(String type, Integer qte, Integer montant, Integer prix) {
-        this.type = type;
-        this.qte = qte;
-        this.montant = montant;
-        this.prix = prix;
-    }
 
     @ManyToOne
     @JoinColumn(name = "nameProduit")

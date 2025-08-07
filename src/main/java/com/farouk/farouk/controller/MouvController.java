@@ -1,5 +1,6 @@
 package com.farouk.farouk.controller;
 
+import com.farouk.farouk.dao.MouvementDto;
 import com.farouk.farouk.model.Mouvement;
 import com.farouk.farouk.service.MouvService;
 import com.farouk.farouk.service.ProdService;
@@ -25,8 +26,8 @@ public class MouvController {
 
     //@PostMapping("/saveMouvement")
     @PostMapping("/entreStortie")
-    public Mouvement entreStortie(@RequestParam String nomP, @RequestParam Integer qteP, @RequestParam String typeP,@RequestParam Integer prix) {
-        return mouvservice.entreSortie(nomP,qteP,typeP,prix);
+    public Mouvement entreStortie(@RequestBody MouvementDto dto) {
+        return mouvservice.entreSortie(dto);
     }
     @PostMapping("/updateM")
     public Mouvement update(Mouvement m){
